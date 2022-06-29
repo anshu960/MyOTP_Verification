@@ -1,8 +1,11 @@
 package com.example.myotp
 
 import android.app.ProgressDialog
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.example.myotp.databinding.ActivityMainBinding
@@ -49,25 +52,57 @@ class MainActivity : AppCompatActivity() {
         mCallBacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks(){
 
             override fun onVerificationCompleted(phoneAuthCredential: PhoneAuthCredential) {
-
+                 signInWithPhoneAuthCredential(phoneAuthCredential)
             }
 
             override fun onVerificationFailed(e: FirebaseException) {
-
+                progressDialog.dismiss()
+                Toast.makeText(this@MainActivity, "${e.message}", Toast.LENGTH_SHORT).show()
             }
 
             override fun onCodeSent(verificationId: String, token: PhoneAuthProvider.ForceResendingToken) {
-                super.onCodeSent(verificationId, token)
+                Log.d(TAG, "onCodeSent: $verificationId")
+                mVerificationId = verificationId
+                forceResendingToken = token
+                progressDialog.dismiss()
+
+                binding.phoneLl.visibility = View.VISIBLE
+                binding.codeLl.visibility = View.GONE
+                Toast.makeText(this@MainActivity, "Verification code sent...", Toast.LENGTH_SHORT).show()
+                binding.codeSentDescriptionTv.text = "Please type the verification code we sent to ${binding.phonEt.text.toString().trim()}"
             }
         }
         binding.phoneContinueBtn.setOnClickListener {
 
+            val phone = binding.phonEt.text.toString().trim()
+
+            if (TextUtils.isEmpty(phone)){
+                Toast.makeText(this@MainActivity, "Please enter Phone Number", Toast.LENGTH_SHORT).show()
+            }
+            else{
+                startPhoneNumberVerification(phone)
+            }
+
         }
         binding.resendCodeTv.setOnClickListener {
+            val phone = binding.phonEt.text.toString().trim()
+
+            if (TextUtils.isEmpty(phone)){
+                Toast.makeText(this@MainActivity, "Please enter Phone Number", Toast.LENGTH_SHORT).show()
+            }
+            else{
+                resendVerificationCode(phone, forceResendingToken)
+            }
 
         }
         binding.phoneContinueBtn.setOnClickListener {
-
+            val code = binding.codeEt.text.toString().trim()
+            if (TextUtils.isEmpty(code)){
+                Toast.makeText(this@MainActivity, "Please enter verification code", Toast.LENGTH_SHORT).show()
+            }
+            else{
+                verifyPhoneNumberWithCode(mVerificationId, code)
+            }
         }
     }
 
@@ -116,6 +151,8 @@ class MainActivity : AppCompatActivity() {
                 progressDialog.dismiss()
                 val phone = firebaseAuth.currentUser!!.phoneNumber
                 Toast.makeText(this, "Logged In as $phone", Toast.LENGTH_SHORT).show()
+
+                startActivity(Intent(this, ProfileActivity::class.java))
 
             }
             .addOnFailureListener { e->
