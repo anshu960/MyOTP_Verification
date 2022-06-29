@@ -4,6 +4,7 @@ import android.app.ProgressDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import com.example.myotp.databinding.ActivityMainBinding
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
@@ -112,11 +113,15 @@ class MainActivity : AppCompatActivity() {
         progressDialog.setMessage("Logging In")
         firebaseAuth.signInWithCredential(credential)
             .addOnSuccessListener {
+                progressDialog.dismiss()
+                val phone = firebaseAuth.currentUser!!.phoneNumber
+                Toast.makeText(this, "Logged In as $phone", Toast.LENGTH_SHORT).show()
 
             }
             .addOnFailureListener { e->
                 progressDialog.dismiss()
-                
+                Toast.makeText(this,"${e.message}", Toast.LENGTH_SHORT).show()
+
             }
 
     }
