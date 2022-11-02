@@ -1,4 +1,5 @@
 <resources>
-    <string name="app_name">My OTP</string>
+    <string name="app_name">WedIn</string>
     <string name="resend">Didn\'t get OTP? <b>Resend</b></string>
+    <string name="note_text_no_happy_places_found_yet">No Data Available</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.example.myotp
+package com.example.myotp.Activity
 
 import android.app.ProgressDialog
 import android.content.Intent
@@ -37,6 +37,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        supportActionBar!!.hide()
 
         binding.phoneLl.visibility = View.VISIBLE
         binding.codeLl.visibility = View.GONE
